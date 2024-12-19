@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('*/10 * * * *') // Проверка изменений каждые 10 секунд
+        pollSCM('* * * * *') // Проверка изменений каждую минуту
     }
     stages {
         stage('Build') {
@@ -16,6 +16,15 @@ pipeline {
                 sh 'mvn test'
             }
         }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                // Копируем JAR в контейнер агента и запускаем
+                sh '''
+                cp target/*.jar /home/jenkins/agent/deployed-app.jar
+                nohup java -jar /home/jenkins/agent/deployed-app.jar > /home/jenkins/agent/app.log 2>&1 &
+                '''
+            }
+        }
     }
 }
-
