@@ -20,14 +20,10 @@ pipeline {
             steps {
                 echo 'Deploying the application...'
                 sh '''
-                # Останавливаем предыдущее приложение, если оно работает
                 pkill -f /home/jenkins/agent/deployed-app.jar || true
-
-                # Запускаем приложение в фоновом режиме с логами
+                cp target/HelloJenkins-1.0-SNAPSHOT.jar /home/jenkins/agent/deployed-app.jar
                 nohup java -jar /home/jenkins/agent/deployed-app.jar > /home/jenkins/agent/app.log 2>&1 &
-
-                # Следим за логами
-                tail -f /home/jenkins/agent/app.log &
+                tail -f /home/jenkins/agent/app.log
                 '''
             }
         }
