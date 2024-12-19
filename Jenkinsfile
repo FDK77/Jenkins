@@ -19,10 +19,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                // Копируем JAR в контейнер агента и запускаем
                 sh '''
-                cp target/*.jar /home/jenkins/agent/deployed-app.jar
+                # Останавливаем предыдущее приложение, если оно работает
+                pkill -f /home/jenkins/agent/deployed-app.jar || true
+
+                # Запускаем приложение в фоновом режиме с логами
                 nohup java -jar /home/jenkins/agent/deployed-app.jar > /home/jenkins/agent/app.log 2>&1 &
+
+                # Следим за логами
+                tail -f /home/jenkins/agent/app.log &
                 '''
             }
         }
